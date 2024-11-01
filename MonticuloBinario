@@ -1,0 +1,233 @@
+package monticulo;
+
+import static java.lang.System.exit;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+public class Monticulo<AnyType extends Comparable<? super AnyType>> {
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner (System.in);
+        
+        int op;
+        Monticulo<Integer> monticulo = new Monticulo<>();
+        
+        System.out.println("AÑADIR ELEMENTOS:");
+        monticulo.add(10);
+        monticulo.add(4);
+        monticulo.add(15);
+        monticulo.add(1);
+        monticulo.add(20);
+        monticulo.add(8);
+        monticulo.imprimirMonticulo();
+        
+        System.out.println("");
+        do {
+        System.out.println("Elemento mínimo actual: " + monticulo.element());
+
+        System.out.println("\n* ELIMINAR ELEMENTO\n");
+        System.out.println("Elemento eliminado: " + monticulo.remove());
+        System.out.println("Nuevo elemento mínimo: " + monticulo.element());
+        
+        System.out.println("Quieres eliminar otro elemento: \n\t0.NO\n\t1.SI");
+        op = scanner.nextInt();
+
+        }while (op!=0);
+        System.out.println("\n***FIN***");
+    }
+
+    private static final int DEFAULT_CAPACITY = 100;
+    private int currentSize; // Número de elementos en el montículo
+    private AnyType[] array; // Arreglo que representa el montículo
+
+// Constructor que inicializa el montículo con la capacidad por defecto.
+    public Monticulo() {
+        currentSize = 0;
+        array = (AnyType[]) new Comparable[DEFAULT_CAPACITY + 1];
+    }
+    
+// Devuelve el elemento mínimo del montículo (el que está en la raíz).
+    public AnyType element() {
+        if (isEmpty()) {
+            System.out.println("Monticulo Binario vacio\n***FIN***");
+            exit(1);
+        }
+        return array[1];
+    }
+
+    public boolean add(AnyType x) {
+        if (currentSize + 1 == array.length) {
+            doubleArray();
+        }
+        int hole = ++currentSize;
+        array[0] = x;
+
+        // Reordenar hacia arriba (percolate up)
+        for (; hole > 1 && x.compareTo(array[hole / 2]) < 0; hole /= 2) {
+            array[hole] = array[hole / 2];
+        }
+        array[hole] = x;
+        
+        return true;
+    }
+    
+    public void imprimirMonticulo (){
+        for (int i = 1; i <= currentSize; i++){
+            System.out.println(array[i]+"");
+        }
+    }
+
+    public AnyType remove() {
+        AnyType minItem = element();
+        array[1] = array[currentSize--];
+        percolateDown(1);
+        return minItem;
+    }
+
+    private void percolateDown(int hole) {
+        int child;
+        AnyType tmp = array[hole];
+
+        while (hole * 2 <= currentSize) {
+            child = hole * 2;
+            // Elegir el hijo más pequeño
+            if (child != currentSize && array[child + 1].compareTo(array[child]) < 0) {
+                child++;
+            }
+            // Si el hijo más pequeño es menor que tmp, desplazarlo hacia arriba
+            if (array[child].compareTo(tmp) < 0) {
+                array[hole] = array[child];
+            } else {
+                break;
+            }
+            hole = child;
+        }
+        array[hole] = tmp;
+    }
+
+    private void doubleArray() {
+        AnyType[] newArray = (AnyType[]) new Comparable[array.length * 2];
+        System.arraycopy(array, 0, newArray, 0, array.length);
+        array = newArray;
+    }
+
+    public boolean isEmpty() {
+        return currentSize == 0;
+    }
+}package monticulo;
+
+import static java.lang.System.exit;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+
+public class Monticulo<AnyType extends Comparable<? super AnyType>> {
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner (System.in);
+        
+        int op;
+        Monticulo<Integer> monticulo = new Monticulo<>();
+        
+        System.out.println("AÑADIR ELEMENTOS:");
+        monticulo.add(10);
+        monticulo.add(4);
+        monticulo.add(15);
+        monticulo.add(1);
+        monticulo.add(20);
+        monticulo.add(8);
+        monticulo.imprimirMonticulo();
+        
+        System.out.println("");
+        do {
+        System.out.println("Elemento mínimo actual: " + monticulo.element());
+
+        System.out.println("\n* ELIMINAR ELEMENTO\n");
+        System.out.println("Elemento eliminado: " + monticulo.remove());
+        System.out.println("Nuevo elemento mínimo: " + monticulo.element());
+        
+        System.out.println("Quieres eliminar otro elemento: \n\t0.NO\n\t1.SI");
+        op = scanner.nextInt();
+
+        }while (op!=0);
+        System.out.println("\n***FIN***");
+    }
+
+    private static final int DEFAULT_CAPACITY = 100;
+    private int currentSize; // Número de elementos en el montículo
+    private AnyType[] array; // Arreglo que representa el montículo
+
+// Constructor que inicializa el montículo con la capacidad por defecto.
+    public Monticulo() {
+        currentSize = 0;
+        array = (AnyType[]) new Comparable[DEFAULT_CAPACITY + 1];
+    }
+    
+// Devuelve el elemento mínimo del montículo (el que está en la raíz).
+    public AnyType element() {
+        if (isEmpty()) {
+            System.out.println("Monticulo Binario vacio\n***FIN***");
+            exit(1);
+        }
+        return array[1];
+    }
+
+    public boolean add(AnyType x) {
+        if (currentSize + 1 == array.length) {
+            doubleArray();
+        }
+        int hole = ++currentSize;
+        array[0] = x;
+
+        // Reordenar hacia arriba (percolate up)
+        for (; hole > 1 && x.compareTo(array[hole / 2]) < 0; hole /= 2) {
+            array[hole] = array[hole / 2];
+        }
+        array[hole] = x;
+        
+        return true;
+    }
+    
+    public void imprimirMonticulo (){
+        for (int i = 1; i <= currentSize; i++){
+            System.out.println(array[i]+"");
+        }
+    }
+
+    public AnyType remove() {
+        AnyType minItem = element();
+        array[1] = array[currentSize--];
+        percolateDown(1);
+        return minItem;
+    }
+
+    private void percolateDown(int hole) {
+        int child;
+        AnyType tmp = array[hole];
+
+        while (hole * 2 <= currentSize) {
+            child = hole * 2;
+            // Elegir el hijo más pequeño
+            if (child != currentSize && array[child + 1].compareTo(array[child]) < 0) {
+                child++;
+            }
+            // Si el hijo más pequeño es menor que tmp, desplazarlo hacia arriba
+            if (array[child].compareTo(tmp) < 0) {
+                array[hole] = array[child];
+            } else {
+                break;
+            }
+            hole = child;
+        }
+        array[hole] = tmp;
+    }
+
+    private void doubleArray() {
+        AnyType[] newArray = (AnyType[]) new Comparable[array.length * 2];
+        System.arraycopy(array, 0, newArray, 0, array.length);
+        array = newArray;
+    }
+
+    public boolean isEmpty() {
+        return currentSize == 0;
+    }
+}
