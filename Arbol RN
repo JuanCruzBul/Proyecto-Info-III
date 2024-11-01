@@ -1,0 +1,323 @@
+package proyecto.pkg8;
+public class ArbolRojinegro {
+    private Nodo raiz;
+
+    public ArbolRojinegro() {
+        this.raiz = null;
+    }
+
+    // Método para insertar un nuevo valor en el árbol
+    public void insertar(int valor) {
+        Nodo nuevoNodo = new Nodo(valor);
+        if (raiz == null) {
+            raiz = nuevoNodo;
+            raiz.color = false; // La raíz siempre es negra
+        } else {
+            insertarRec(raiz, nuevoNodo);
+            arreglarRojinegro(nuevoNodo);
+        }
+    }
+
+    private void insertarRec(Nodo raiz, Nodo nuevoNodo) {
+        if (nuevoNodo.valor < raiz.valor) {
+            if (raiz.izquierda == null) {
+                raiz.izquierda = nuevoNodo;
+                nuevoNodo.padre = raiz;
+            } else {
+                insertarRec(raiz.izquierda, nuevoNodo);
+            }
+        } else {
+            if (raiz.derecha == null) {
+                raiz.derecha = nuevoNodo;
+                nuevoNodo.padre = raiz;
+            } else {
+                insertarRec(raiz.derecha, nuevoNodo);
+            }
+        }
+    }
+
+    private void arreglarRojinegro(Nodo nodo) {
+        while (nodo != raiz && nodo.padre.color) {
+            if (nodo.padre == nodo.padre.padre.izquierda) {
+                Nodo tio = nodo.padre.padre.derecha;
+                if (tio != null && tio.color) {
+                    nodo.padre.color = false;
+                    tio.color = false;
+                    nodo.padre.padre.color = true;
+                    nodo = nodo.padre.padre;
+                } else {
+                    if (nodo == nodo.padre.derecha) {
+                        nodo = nodo.padre;
+                        rotarIzquierda(nodo);
+                    }
+                    nodo.padre.color = false;
+                    nodo.padre.padre.color = true;
+                    rotarDerecha(nodo.padre.padre);
+                }
+            } else {
+                Nodo tio = nodo.padre.padre.izquierda;
+                if (tio != null && tio.color) {
+                    nodo.padre.color = false;
+                    tio.color = false;
+                    nodo.padre.padre.color = true;
+                    nodo = nodo.padre.padre;
+                } else {
+                    if (nodo == nodo.padre.izquierda) {
+                        nodo = nodo.padre;
+                        rotarDerecha(nodo);
+                    }
+                    nodo.padre.color = false;
+                    nodo.padre.padre.color = true;
+                    rotarIzquierda(nodo.padre.padre);
+                }
+            }
+        }
+        raiz.color = false; // Asegura que la raíz sea negra
+    }
+
+    private void rotarIzquierda(Nodo nodo) {
+        Nodo nuevoRaiz = nodo.derecha;
+        nodo.derecha = nuevoRaiz.izquierda;
+
+        if (nuevoRaiz.izquierda != null) {
+            nuevoRaiz.izquierda.padre = nodo;
+        }
+
+        nuevoRaiz.padre = nodo.padre;
+
+        if (nodo.padre == null) {
+            raiz = nuevoRaiz;
+        } else if (nodo == nodo.padre.izquierda) {
+            nodo.padre.izquierda = nuevoRaiz;
+        } else {
+            nodo.padre.derecha = nuevoRaiz;
+        }
+
+        nuevoRaiz.izquierda = nodo;
+        nodo.padre = nuevoRaiz;
+    }
+
+    private void rotarDerecha(Nodo nodo) {
+        Nodo nuevoRaiz = nodo.izquierda;
+        nodo.izquierda = nuevoRaiz.derecha;
+
+        if (nuevoRaiz.derecha != null) {
+            nuevoRaiz.derecha.padre = nodo;
+        }
+
+        nuevoRaiz.padre = nodo.padre;
+
+        if (nodo.padre == null) {
+            raiz = nuevoRaiz;
+        } else if (nodo == nodo.padre.derecha) {
+            nodo.padre.derecha = nuevoRaiz;
+        } else {
+            nodo.padre.izquierda = nuevoRaiz;
+        }
+
+        nuevoRaiz.derecha = nodo;
+        nodo.padre = nuevoRaiz;
+    }
+
+    // Método para visualizar el árbol
+    public void visualizarArbol() {
+        if (raiz == null) {
+            System.out.println("El árbol está vacío.");
+            return;
+        }
+        visualizarRec(raiz);
+    }
+
+    private void visualizarRec(Nodo nodo) {
+        if (nodo != null) {
+            visualizarRec(nodo.izquierda);
+            System.out.println("Valor: " + nodo.valor + ", Color: " + (nodo.color ? "Rojo" : "Negro"));
+            visualizarRec(nodo.derecha);
+        }
+    }
+    
+    public void eliminar(int valor) {
+    Nodo nodoAEliminar = buscarNodo(raiz, valor);
+    if (nodoAEliminar == null) {
+        System.out.println("El valor " + valor + " no se encontró en el árbol.");
+        return;
+    }
+
+    Nodo nodoEliminado = eliminar(nodoAEliminar);
+    if (nodoEliminado != null) {
+        System.out.println("Nodo eliminado: " + nodoEliminado.valor);
+    }
+}
+
+private Nodo buscarNodo(Nodo nodo, int valor) {
+    if (nodo == null || valor == nodo.valor) {
+        return nodo;
+    }
+    if (valor < nodo.valor) {
+        return buscarNodo(nodo.izquierda, valor);
+    } else {
+        return buscarNodo(nodo.derecha, valor);
+    }
+}
+    private Nodo eliminar(Nodo nodo) {
+    Nodo nodoEliminado = nodo;
+    boolean originalColor = nodoEliminado.color;
+
+    Nodo reemplazo;
+    if (nodo.izquierda == null) {
+        reemplazo = nodo.derecha;
+        transplantar(nodo, nodo.derecha);
+    } else if (nodo.derecha == null) {
+        reemplazo = nodo.izquierda;
+        transplantar(nodo, nodo.izquierda);
+    } else {
+        nodoEliminado = minimo(nodo.derecha);
+        originalColor = nodoEliminado.color;
+        reemplazo = nodoEliminado.derecha;
+        if (nodoEliminado.padre == nodo) {
+            if (reemplazo != null) {
+                reemplazo.padre = nodoEliminado;
+            }
+        } else {
+            transplantar(nodoEliminado, reemplazo);
+            nodoEliminado.derecha = nodo.derecha;
+            nodoEliminado.derecha.padre = nodoEliminado;
+        }
+        transplantar(nodo, nodoEliminado);
+        nodoEliminado.izquierda = nodo.izquierda;
+        nodoEliminado.izquierda.padre = nodoEliminado;
+        nodoEliminado.color = nodo.color;
+    }
+
+    return originalColor ? nodoEliminado : reemplazo;
+}
+
+private void transplantar(Nodo nodoAReemplazar, Nodo nodoNuevo) {
+    if (nodoAReemplazar.padre == null) {
+        raiz = nodoNuevo;
+    } else if (nodoAReemplazar == nodoAReemplazar.padre.izquierda) {
+        nodoAReemplazar.padre.izquierda = nodoNuevo;
+    } else {
+        nodoAReemplazar.padre.derecha = nodoNuevo;
+    }
+    if (nodoNuevo != null) {
+        nodoNuevo.padre = nodoAReemplazar.padre;
+    }
+}
+
+private Nodo minimo(Nodo nodo) {
+    while (nodo.izquierda != null) {
+        nodo = nodo.izquierda;
+    }
+    return nodo;
+}
+
+
+    public boolean verificarPropiedades() {
+    // Comienza desde la raíz y comprueba si las propiedades son válidas
+    return esPropiedadesCumplidas(raiz) != -1;
+}
+
+private int esPropiedadesCumplidas(Nodo nodo) {
+    if (nodo == null) {
+        return 1; // Las hojas (NIL) se consideran negras
+    }
+
+    // Comprobar las propiedades del subárbol izquierdo y derecho
+    int izquierda = esPropiedadesCumplidas(nodo.izquierda);
+    int derecha = esPropiedadesCumplidas(nodo.derecha);
+
+    // Verificar las propiedades del árbol rojinegro
+    if (izquierda == -1 || derecha == -1) {
+        return -1; // Propiedades no cumplidas en subárboles
+    }
+
+    // Verificar si ambos hijos son negros si el nodo actual es rojo
+    if (nodo.color && (nodo.izquierda != null && nodo.izquierda.color) || (nodo.derecha != null && nodo.derecha.color)) {
+        return -1; // Propiedad 4: si un nodo es rojo, sus hijos deben ser negros
+    }
+
+    // Comprobar si la cantidad de nodos negros en el subárbol izquierdo y derecho son iguales
+    if (izquierda != derecha) {
+        return -1; // Propiedad 5: la cantidad de nodos negros debe ser igual
+    }
+
+    // Retorna la altura negra del nodo
+    return izquierda + (nodo.color ? 0 : 1); // Si el nodo es negro, suma 1
+}
+
+
+    // Método para calcular altura negra
+    public int alturaNegra() {
+        return alturaNegraRec(raiz);
+    }
+
+    private int alturaNegraRec(Nodo nodo) {
+        if (nodo == null) {
+            return 1; // Retorna 1 por el negro
+        }
+        int izquierda = alturaNegraRec(nodo.izquierda);
+        int derecha = alturaNegraRec(nodo.derecha);
+        if (izquierda != derecha) {
+            throw new RuntimeException("Las alturas negras son diferentes.");
+        }
+        return nodo.color ? izquierda : izquierda + 1; // Cuenta el negro si es negro
+    }
+}
+
+package proyecto.pkg8;
+public class Main {
+    public static void main(String[] args) {
+        ArbolRojinegro arbol = new ArbolRojinegro();
+
+        // Inserción de elementos
+        int[] elementos = {10, 20, 30, 40, 50, 60, 70};
+        for (int elemento : elementos) {
+            arbol.insertar(elemento);
+            System.out.println("Arbol despues de insertar " + elemento + ":");
+            arbol.visualizarArbol();
+            System.out.println();
+        }
+
+          // Verificación de propiedades
+        if (arbol.verificarPropiedades()) {
+            System.out.println("El arbol cumple con las propiedades del arbol rojinegro.");
+        } else{
+            System.out.println("El arbol no cumple con las propiedades del arbol rojinegro.");
+        }
+
+        // Calcular altura negra
+        int alturaNegra = arbol.alturaNegra();
+        System.out.println("La altura negra del arbol es: " + alturaNegra);
+        
+        // Eliminar un nodo (debe implementar el método)
+         arbol.eliminar(30);
+         System.out.println("Arbol despues de borrar el 30: ");
+         
+            arbol.visualizarArbol();
+            System.out.println();
+           // Verificación de propiedades
+        if (arbol.verificarPropiedades()) {
+            System.out.println("El arbol cumple con las propiedades del arbol rojinegro.");
+        } else{
+            System.out.println("El arbol no cumple con las propiedades del arbol rojinegro.");
+        }
+    }
+}
+
+package proyecto.pkg8;
+public class Nodo {
+    int valor;
+    Nodo izquierda, derecha, padre;
+    boolean color; // true para rojo, false para negro
+
+    public Nodo(int valor) {
+        this.valor = valor;
+        this.color = true; // nuevo nodo es rojo por defecto
+        this.izquierda = null;
+        this.derecha = null;
+        this.padre = null;
+    }
+}
+
+
